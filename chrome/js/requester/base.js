@@ -247,28 +247,52 @@ pm.init = function() {
             initializeDirectory();
 
             pm.hasPostmanInitialized = true;
+
+            postInit();
+        });
+    });
+
+    function postInit() {
+
+//         $("#import-all-data-files-input").on("change", function(event) {
+//            console.log("Process file and import data");
+//            var files = event.target.files;
+//            pm.indexedDB.importAllData(files, function() {
+//                $("#import-all-data-files-input").val("");
+//                noty(
+//                {
+//                    type:'success',
+//                    text:'Imported all data',
+//                    layout:'topCenter',
+//                    timeout:750
+//                });
+//            });
+//        });
+
+        pm.storage.getValue("ijenko", function(s) {
+            if (s) {
+                $('#ijenko-collections').val(s.join(","));
+            }
         });
 
         $('#ijenko-collections').on('change', function() {
-            ijenkoCollection = $(this).split(',');
-            pm.storage.setValue({"ijenko": [ijenkoCollection]});
+            pm.storage.setValue({"ijenko": $(this).val().split(',')});
 
             loadIjenkoCollections();
         });
 
         function loadIjenkoCollections() {
-            var ijenkoCollection = pm.storage.getValue("ijenko", function(s) {
-                return s;
-            });
-            if (ijenkoCollection) {
-                for (var i in ijenkoCollection) {
-                    pm.collections.importCollectionFromUrl(ijenkoCollection[i]);
+            pm.storage.getValue("ijenko", function(s) {
+                if (s) {
+                    for (var i in s) {
+                        pm.collections.importCollectionFromUrl(s[i]);
+                    }
                 }
-            }
+            });
         }
 
         loadIjenkoCollections();
-    });
+    }
 };
 
 $(document).ready(function() {
