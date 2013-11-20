@@ -38,8 +38,8 @@ pm.debug = false;
 pm.indexedDB = {};
 pm.indexedDB.db = null;
 pm.indexedDB.modes = {
-    readwrite:"readwrite",
-    readonly:"readonly"
+    readwrite: "readwrite",
+    readonly: "readonly"
 };
 
 pm.fs = {};
@@ -71,8 +71,8 @@ pm.bannedHeaders = [
 
 // IndexedDB implementations still use API prefixes
 var indexedDB = window.indexedDB || // Use the standard DB API
-    window.mozIndexedDB || // Or Firefox's early version of it
-    window.webkitIndexedDB;            // Or Chrome's early version
+        window.mozIndexedDB || // Or Firefox's early version of it
+        window.webkitIndexedDB;            // Or Chrome's early version
 // Firefox does not prefix these two:
 var IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction;
 var IDBKeyRange = window.IDBKeyRange || window.webkitIDBKeyRange;
@@ -80,7 +80,7 @@ var IDBCursor = window.IDBCursor || window.webkitIDBCursor;
 
 window.requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem;
 
-pm.init = function () {
+pm.init = function() {
     Handlebars.partials = Handlebars.templates;
 
     function initializePostmanAPI() {
@@ -192,7 +192,7 @@ pm.init = function () {
 
     function initializeSidebar() {
         var sidebarState = new SidebarState({history: pm.history, collections: pm.collections});
-        var sidebar = new Sidebar({ model: sidebarState });
+        var sidebar = new Sidebar({model: sidebarState});
     }
 
     function initializeDriveSync() {
@@ -248,9 +248,29 @@ pm.init = function () {
 
             pm.hasPostmanInitialized = true;
         });
+
+        $('#ijenko-collections').on('change', function() {
+            ijenkoCollection = $(this).split(',');
+            pm.storage.setValue({"ijenko": [ijenkoCollection]});
+
+            loadIjenkoCollections();
+        });
+
+        function loadIjenkoCollections() {
+            var ijenkoCollection = pm.storage.getValue("ijenko", function(s) {
+                return s;
+            });
+            if (ijenkoCollection) {
+                for (var i in ijenkoCollection) {
+                    pm.collections.importCollectionFromUrl(ijenkoCollection[i]);
+                }
+            }
+        }
+
+        loadIjenkoCollections();
     });
 };
 
-$(document).ready(function () {
+$(document).ready(function() {
     pm.init();
 });
